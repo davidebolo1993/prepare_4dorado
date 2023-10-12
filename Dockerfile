@@ -37,6 +37,10 @@ RUN apt-get -y install build-essential \
 #install golang
 RUN add-apt-repository ppa:longsleep/golang-backports
 
+RUN apt-get -y install golang-go \
+	&& apt-get -y clean all \
+	&& rm -rf /var/cache
+
 RUN git clone https://github.com/davidebolo1993/prepare_4dorado \
 	&& cd prepare_4dorado \
 	&& go mod init split_by_channel \
