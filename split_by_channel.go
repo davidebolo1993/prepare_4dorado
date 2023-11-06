@@ -170,7 +170,7 @@ func errWorker(errsChan bigcsvreader.ErrsChan, waitGr *sync.WaitGroup) {
 func processRow(row []string, info map[int][]string) {
 
 	pod5 := row[column_filename_pod5]
-	id := row[column_read_id]
+	id := row[column_parent_read_id]
 	channel,_:= strconv.Atoi(row[column_channel])
 
 	if row[column_passes_filtering] == "TRUE" {
