@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 LABEL description="prepare_4dorado"
 LABEL base_image="ubuntu:latest"
-LABEL software="split_by_channel"
+LABEL software="split_by_channel and make_channel_pod5_multiproc.py"
 LABEL about.home="https://github.com/davidebolo1993/prepare_4dorado"
 LABEL about.license="GPLv3"
 
@@ -40,6 +40,10 @@ RUN add-apt-repository ppa:longsleep/golang-backports
 RUN apt-get -y install golang-go \
 	&& apt-get -y clean all \
 	&& rm -rf /var/cache
+
+#install required python modules
+RUN pip3 install pod5
+
 
 RUN git clone https://github.com/davidebolo1993/prepare_4dorado \
 	&& cd prepare_4dorado \
