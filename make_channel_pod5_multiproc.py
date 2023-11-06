@@ -1,4 +1,4 @@
-#!/usr/bin/python3 env
+#!/usr/bin/python3
 
 import pod5 as p5
 import csv
