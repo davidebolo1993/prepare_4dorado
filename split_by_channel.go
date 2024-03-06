@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"os"
 	"strings"
+	"bufio"
 
 	"github.com/actforgood/bigcsvreader"
 )
@@ -64,7 +65,21 @@ func main() {
 
 	summary:=os.Args[1]
 	outdir:=os.Args[2]
+	accept_list:=os.Args[3]
+	
+	f,_ := os.Open(accept_list)
+	defer f.Close()
 
+	accept:=make(map[string]bool)
+
+	b:=bufio.NewScanner(f)
+
+	for b.Scan() {
+
+		line:=b.Text()
+		accept[line]=true
+
+	}
 
 	bigCSV := bigcsvreader.New()
 	bigCSV.SetFilePath(summary)
@@ -89,7 +104,7 @@ func main() {
 
 	for i := 0; i < len(rowsChans); i++ {
 		wg.Add(1)
-		go rowWorker(rowsChans[i], info, &wg)
+		go rowWorker(rowsChans[i], info, accept, &wg)
 	}
 
 	wg.Add(1)
@@ -133,13 +148,13 @@ func main() {
 
 }
 
-func rowWorker(rowsChan bigcsvreader.RowsChan, info map[int][]string, waitGr *sync.WaitGroup) {
+func rowWorker(rowsChan bigcsvreader.RowsChan, info map[int][]string, accept map[string]bool, waitGr *sync.WaitGroup) {
 	
 	i:=0
 	
 	for row := range rowsChan {
 
-		processRow(row,info)
+		processRow(row,info,accept)
 
 		//print number of entries processed
 		if i%100000 == 0 {
@@ -167,13 +182,14 @@ func errWorker(errsChan bigcsvreader.ErrsChan, waitGr *sync.WaitGroup) {
 
 // processRow can be used to implement business logic
 // like validation / converting to a struct / persisting row into a storage.
-func processRow(row []string, info map[int][]string) {
+func processRow(row []string, info map[int][]string, accept map[string]bool) {
 
 	pod5 := row[column_filename_pod5]
 	id := row[column_parent_read_id]
 	channel,_:= strconv.Atoi(row[column_channel])
+	_,isaccepted:=accept[pod5]
 
-	if row[column_passes_filtering] == "TRUE" {
+	if row[column_passes_filtering] == "TRUE" || isaccepted {
 
 		info[channel] = append(info[channel], pod5 + "$" + id) //use a single string that will be splitted after
 
