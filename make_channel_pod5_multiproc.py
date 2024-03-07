@@ -32,7 +32,7 @@ def Writer(sli,pod5_reads):
         reader.close()
 
 
-def process(pass_dir, in_file, out_file,threads, skip_dir):
+def process(in_file, out_file,threads):
 
     #store paths
     allf=[]
@@ -40,7 +40,6 @@ def process(pass_dir, in_file, out_file,threads, skip_dir):
     #store reads
     manager = multiprocessing.Manager()
     pod5_reads=manager.list()
-    in_dir=pass_dir
 
     with open(in_file) as file_in:
 
@@ -48,8 +47,7 @@ def process(pass_dir, in_file, out_file,threads, skip_dir):
 
         for line in tsv_file:
 
-            in_dir=skip_dir if skip_dir != "None" and "skip" in line[0] else pass_dir
-            pod5_path=os.path.join(in_dir, line[0])
+            pod5_path=line[0]
             allf.append((pod5_path,line[1]))
 
     chunk_size=len(allf)/threads
@@ -76,9 +74,7 @@ def process(pass_dir, in_file, out_file,threads, skip_dir):
 
 if __name__ == '__main__':
 
-    pass_dir=sys.argv[1]
-    in_file=sys.argv[2]
-    out_file=sys.argv[3]
-    threads=int(sys.argv[4])
-    skip_dir=sys.argv[5]
-    process(pass_dir, in_file, out_file,threads, skip_dir)
+    in_file=sys.argv[1]
+    out_file=sys.argv[2]
+    threads=int(sys.argv[3])
+    process(in_file, out_file,threads)
